@@ -55,15 +55,15 @@ export const imageUrlGenerator = definePlugin<PluginOptions | void>((options = {
 })
 
 /** @public */
-export {ImageUrlGenerator} from './components/ImageUrlGenerator'
+export {ImageUrlGenerator, type ImageUrlGeneratorProps} from './components/ImageUrlGenerator'
 /** @public */
-export {AspectRatioSelector} from './components/AspectRatioSelector'
+export {AspectRatioSelector, type AspectRatioSelectorProps} from './components/AspectRatioSelector'
 /** @public */
-export {SizeSelector} from './components/SizeSelector'
+export {SizeSelector, type SizeSelectorProps} from './components/SizeSelector'
 /** @public */
-export {UrlDisplay} from './components/UrlDisplay'
+export {UrlDisplay, type UrlDisplayProps} from './components/UrlDisplay'
 /** @public */
-export {CopyButton} from './components/CopyButton'
+export {CopyButton, type CopyButtonProps} from './components/CopyButton'
 
 /** @public */
 export {buildImageUrl, buildImageUrls, getPreviewUrl, type BuildImageUrlParams} from './utils/urlBuilder'

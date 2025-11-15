@@ -2,7 +2,11 @@ import React, {useState} from 'react'
 import {Button, Tooltip} from '@sanity/ui'
 import {ClipboardIcon, CheckmarkIcon} from '@sanity/icons'
 
-interface CopyButtonProps {
+/**
+ * Props for CopyButton component
+ * @public
+ */
+export interface CopyButtonProps {
   text: string
   label?: string
   tone?: 'default' | 'primary' | 'positive' | 'caution' | 'critical'
@@ -10,6 +14,7 @@ interface CopyButtonProps {
 
 /**
  * A button that copies text to clipboard with visual feedback
+ * @public
  */
 export function CopyButton({text, label = 'Copy', tone = 'default'}: CopyButtonProps) {
   const [copied, setCopied] = useState(false)

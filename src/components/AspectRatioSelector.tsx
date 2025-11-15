@@ -2,7 +2,11 @@ import React from 'react'
 import {Box, Card, Flex, Grid, Label, Select, Stack, Text, TextInput} from '@sanity/ui'
 import {COMMON_ASPECT_RATIOS, isValidAspectRatio} from '../utils/aspectRatioCalculator'
 
-interface AspectRatioSelectorProps {
+/**
+ * Props for AspectRatioSelector component
+ * @public
+ */
+export interface AspectRatioSelectorProps {
   value: string
   onChange: (ratio: string) => void
   customWidth: string
@@ -15,6 +19,7 @@ interface AspectRatioSelectorProps {
 
 /**
  * Component for selecting aspect ratios with preset options and custom input
+ * @public
  */
 export function AspectRatioSelector({
   value,

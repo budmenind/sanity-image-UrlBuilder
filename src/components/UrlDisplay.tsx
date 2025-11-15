@@ -2,7 +2,11 @@ import React, {useState} from 'react'
 import {Box, Card, Code, Flex, Label, Stack, Tab, TabList, TabPanel, Text} from '@sanity/ui'
 import {CopyButton} from './CopyButton'
 
-interface UrlDisplayProps {
+/**
+ * Props for UrlDisplay component
+ * @public
+ */
+export interface UrlDisplayProps {
   singleUrl: string
   html: string
   markdown: string
@@ -12,6 +16,7 @@ interface UrlDisplayProps {
 
 /**
  * Component for displaying and copying generated URLs in multiple formats
+ * @public
  */
 export function UrlDisplay({singleUrl, html, markdown, json, previewUrl}: UrlDisplayProps) {
   const [activeTab, setActiveTab] = useState('html')

@@ -23,13 +23,18 @@ import type {
   PluginOptions,
 } from '../types'
 
-interface ImageUrlGeneratorProps extends ObjectInputProps {
+/**
+ * Props for ImageUrlGenerator component
+ * @public
+ */
+export interface ImageUrlGeneratorProps extends ObjectInputProps {
   options?: PluginOptions
 }
 
 /**
  * Main component for the Image URL Generator plugin
  * Wraps Sanity's default image input and adds URL generation functionality
+ * @public
  */
 export function ImageUrlGenerator(props: ImageUrlGeneratorProps) {
   const {value, onChange, schemaType, options = {}} = props

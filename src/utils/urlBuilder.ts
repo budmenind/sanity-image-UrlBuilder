@@ -14,6 +14,10 @@ interface SanityImageSource {
   hotspot?: HotspotData
 }
 
+/**
+ * Parameters for building image URLs
+ * @public
+ */
 export interface BuildImageUrlParams {
   projectId: string
   dataset: string
@@ -29,6 +33,7 @@ export interface BuildImageUrlParams {
 
 /**
  * Build a single image URL with transformations
+ * @public
  */
 export function buildImageUrl(params: BuildImageUrlParams): string {
   const {projectId, dataset, asset, width, aspectRatio, fit, quality, format, crop, hotspot} =
@@ -72,6 +77,7 @@ export function buildImageUrl(params: BuildImageUrlParams): string {
 
 /**
  * Build multiple image URLs for different widths
+ * @public
  */
 export function buildImageUrls(
   params: Omit<BuildImageUrlParams, 'width'> & {widths: number[]}
@@ -86,6 +92,7 @@ export function buildImageUrls(
 
 /**
  * Get a preview URL for the image (medium size, optimized for UI display)
+ * @public
  */
 export function getPreviewUrl(params: Omit<BuildImageUrlParams, 'width'>): string {
   return buildImageUrl({...params, width: 800})

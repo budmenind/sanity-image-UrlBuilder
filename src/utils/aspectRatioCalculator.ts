@@ -1,5 +1,6 @@
 /**
  * Parse aspect ratio string (e.g., "16:9") into width and height values
+ * @public
  */
 export function parseAspectRatio(ratio: string): {width: number; height: number} {
   const [widthStr, heightStr] = ratio.split(':')
@@ -15,6 +16,7 @@ export function parseAspectRatio(ratio: string): {width: number; height: number}
 
 /**
  * Calculate height from width and aspect ratio
+ * @public
  */
 export function calculateHeight(width: number, aspectRatio: string): number {
   const {width: ratioWidth, height: ratioHeight} = parseAspectRatio(aspectRatio)
@@ -23,6 +25,7 @@ export function calculateHeight(width: number, aspectRatio: string): number {
 
 /**
  * Validate aspect ratio string format
+ * @public
  */
 export function isValidAspectRatio(ratio: string): boolean {
   try {
@@ -35,6 +38,7 @@ export function isValidAspectRatio(ratio: string): boolean {
 
 /**
  * Common aspect ratios for quick selection
+ * @public
  */
 export const COMMON_ASPECT_RATIOS = [
   {label: '16:9 (Widescreen)', value: '16:9'},
@@ -49,5 +53,6 @@ export const COMMON_ASPECT_RATIOS = [
 
 /**
  * Common width presets for responsive images
+ * @public
  */
 export const COMMON_WIDTHS = [320, 480, 640, 800, 1024, 1200, 1600, 2400]

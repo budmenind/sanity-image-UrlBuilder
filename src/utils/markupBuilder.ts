@@ -4,6 +4,7 @@ import type {ResponsiveMarkupOptions} from '../types'
 
 /**
  * Generate responsive HTML markup with srcset
+ * @public
  */
 export function buildResponsiveHtml(options: ResponsiveMarkupOptions): string {
   const {
@@ -64,6 +65,7 @@ export function buildResponsiveHtml(options: ResponsiveMarkupOptions): string {
 
 /**
  * Generate Markdown image syntax with URL
+ * @public
  */
 export function buildMarkdown(options: ResponsiveMarkupOptions): string {
   const {projectId, dataset, asset, widths, aspectRatio, alt, fit, quality, format, crop, hotspot} =
@@ -89,6 +91,7 @@ export function buildMarkdown(options: ResponsiveMarkupOptions): string {
 
 /**
  * Generate JSON object with all URLs
+ * @public
  */
 export function buildJson(options: ResponsiveMarkupOptions): object {
   const {projectId, dataset, asset, widths, aspectRatio, alt, fit, quality, format, crop, hotspot} =
@@ -123,6 +126,7 @@ export function buildJson(options: ResponsiveMarkupOptions): object {
 
 /**
  * Build all markup formats at once
+ * @public
  */
 export function buildAllMarkup(options: ResponsiveMarkupOptions): {
   html: string

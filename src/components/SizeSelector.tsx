@@ -2,7 +2,11 @@ import React from 'react'
 import {Box, Card, Checkbox, Flex, Grid, Label, Stack, Text, TextInput} from '@sanity/ui'
 import {COMMON_WIDTHS} from '../utils/aspectRatioCalculator'
 
-interface SizeSelectorProps {
+/**
+ * Props for SizeSelector component
+ * @public
+ */
+export interface SizeSelectorProps {
   selectedWidths: number[]
   onChange: (widths: number[]) => void
   customWidth: string
@@ -11,6 +15,7 @@ interface SizeSelectorProps {
 
 /**
  * Component for selecting image widths with preset options and custom input
+ * @public
  */
 export function SizeSelector({
   selectedWidths,
