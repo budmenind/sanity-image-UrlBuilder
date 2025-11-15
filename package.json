@@ -1,0 +1,97 @@
+{
+  "name": "sanity-plugin-image-url-generator",
+  "version": "1.0.0",
+  "description": "A Sanity Studio v3 plugin that generates responsive image URLs with copy-paste functionality",
+  "keywords": [
+    "sanity",
+    "sanity-plugin",
+    "image",
+    "responsive",
+    "url-generator"
+  ],
+  "homepage": "https://github.com/budmenind/sanity-image-UrlBuilder#readme",
+  "bugs": {
+    "url": "https://github.com/budmenind/sanity-image-UrlBuilder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/budmenind/sanity-image-UrlBuilder.git"
+  },
+  "license": "MIT",
+  "author": "budmenind",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "source": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "sanity.json",
+    "src",
+    "v2-incompatible.js"
+  ],
+  "scripts": {
+    "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
+    "clean": "rimraf dist",
+    "format": "prettier --write --cache --ignore-unknown .",
+    "link-watch": "plugin-kit link-watch",
+    "lint": "eslint .",
+    "prepublishOnly": "run-s build",
+    "watch": "pkg-utils watch --strict",
+    "prepare": "husky install"
+  },
+  "sanityPlugin": {
+    "verifyPackage": {
+      "apiExtractor": false
+    }
+  },
+  "dependencies": {
+    "@sanity/icons": "^2.11.0",
+    "@sanity/image-url": "^1.0.2",
+    "@sanity/incompatible-plugin": "^1.0.4",
+    "@sanity/ui": "^2.0.0",
+    "@sanity/util": "^3.26.0"
+  },
+  "devDependencies": {
+    "@sanity/pkg-utils": "^3.3.0",
+    "@sanity/plugin-kit": "^3.1.10",
+    "@sanity/semantic-release-preset": "^4.1.6",
+    "@types/react": "^18.2.45",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-sanity": "^7.0.1",
+    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.1.1",
+    "prettier-plugin-packagejson": "^2.4.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-is": "^18.2.0",
+    "rimraf": "^5.0.5",
+    "sanity": "^3.26.0",
+    "styled-components": "^6.1.8",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "sanity": "^3"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
