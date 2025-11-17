@@ -28,7 +28,7 @@ import type {
  * @public
  */
 export interface ImageUrlGeneratorProps extends ObjectInputProps {
-  options?: PluginOptions
+  // Component receives options from schemaType.options
 }
 
 /**
@@ -37,7 +37,8 @@ export interface ImageUrlGeneratorProps extends ObjectInputProps {
  * @public
  */
 export function ImageUrlGenerator(props: ImageUrlGeneratorProps) {
-  const {value, onChange, schemaType, options = {}} = props
+  const {value, renderDefault, schemaType} = props
+  const options = (schemaType.options as PluginOptions) || {}
   const client = useClient({apiVersion: '2023-01-01'})
 
   // Get project configuration
@@ -148,42 +149,12 @@ export function ImageUrlGenerator(props: ImageUrlGeneratorProps) {
     []
   )
 
-  // Render the default Sanity image input
-  const renderImageInput = useCallback(() => {
-    // We need to use Sanity's default image input component
-    // This is a simplified version - in production, you'd import and use the actual ImageInput
-    return (
-      <Card border padding={3} radius={2}>
-        <Stack space={3}>
-          <Text weight="semibold">Image Upload</Text>
-          <Text size={1} muted>
-            Use Sanity Studio's built-in image picker to select or upload an image
-          </Text>
-          {imageAssetId && (
-            <Box>
-              <Text size={1} style={{color: 'green'}}>
-                ✓ Image selected
-              </Text>
-            </Box>
-          )}
-          {!imageAssetId && (
-            <Box>
-              <Text size={1} muted>
-                No image selected - Please add an image field to your schema
-              </Text>
-            </Box>
-          )}
-        </Stack>
-      </Card>
-    )
-  }, [imageAssetId])
-
   return (
     <Stack space={4}>
-      {/* Image Input Section */}
-      {renderImageInput()}
+      {/* Render Sanity's default image input (with upload, hotspot, crop, etc.) */}
+      {renderDefault(props)}
 
-      {/* Configuration Panel */}
+      {/* Configuration Panel - Only show if image is selected */}
       {asset && (
         <Card border padding={4} radius={2}>
           <Stack space={4}>
@@ -302,20 +273,11 @@ export function ImageUrlGenerator(props: ImageUrlGeneratorProps) {
         </Card>
       )}
 
-      {/* No image selected message */}
-      {!asset && !isLoadingAsset && (
-        <Card border padding={4} radius={2} tone="transparent">
-          <Text size={1} align="center" muted>
-            Select or upload an image to generate URLs
-          </Text>
-        </Card>
-      )}
-
       {/* Loading state */}
       {isLoadingAsset && (
         <Card border padding={4} radius={2} tone="transparent">
           <Text size={1} align="center" muted>
-            Loading image...
+            Loading image details...
           </Text>
         </Card>
       )}
