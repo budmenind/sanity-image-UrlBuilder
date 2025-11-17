@@ -5,12 +5,7 @@
   },
   "parts": [
     {
-      "name": "part:image-url-generator/tool",
       "implements": "part:@sanity/base/tool",
-      "path": "tool/ImageUrlGeneratorTool.tsx"
-    },
-    {
-      "implements": "part:image-url-generator/tool",
       "path": "tool/index.ts"
     }
   ]

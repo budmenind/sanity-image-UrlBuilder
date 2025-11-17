@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {Box, Button, Card, Container, Flex, Grid, Heading, Label, Select, Stack, Text, TextInput} from '@sanity/ui'
-import {useClient} from 'sanity'
+import sanityClient from 'part:@sanity/base/client'
 import type {SanityImageAssetDocument} from '@sanity/client'
 import {AspectRatioSelector} from '../components/AspectRatioSelector'
 import {SizeSelector} from '../components/SizeSelector'
@@ -20,11 +20,13 @@ import type {
  * Provides a standalone interface to browse media library and generate URLs
  */
 export default function ImageUrlGeneratorTool() {
-  const client = useClient({apiVersion: '2023-01-01'})
+  // V2 uses direct client import, not a hook
+  const client = sanityClient.withConfig({apiVersion: '2023-01-01'})
 
   // Get project configuration
-  const projectId = client.config().projectId || ''
-  const dataset = client.config().dataset || ''
+  const config = client.config()
+  const projectId = config.projectId || ''
+  const dataset = config.dataset || ''
 
   // Media library state
   const [assets, setAssets] = useState<SanityImageAssetDocument[]>([])
@@ -54,11 +56,11 @@ export default function ImageUrlGeneratorTool() {
 
     client
       .fetch<SanityImageAssetDocument[]>(query, {search: `*${searchQuery}*`})
-      .then((fetchedAssets) => {
+      .then((fetchedAssets: SanityImageAssetDocument[]) => {
         setAssets(fetchedAssets)
         setIsLoadingAssets(false)
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error('Failed to fetch assets:', error)
         setIsLoadingAssets(false)
       })
