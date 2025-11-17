@@ -1,7 +1,7 @@
 {
   "name": "sanity-plugin-image-url-generator",
   "version": "1.0.0",
-  "description": "A Sanity Studio v3 plugin that generates responsive image URLs with copy-paste functionality",
+  "description": "A Sanity Studio plugin (V2/V3) that provides a standalone tool for generating responsive image URLs with copy-paste functionality",
   "keywords": [
     "sanity",
     "sanity-plugin",
@@ -35,13 +35,13 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "lib",
     "sanity.json",
-    "src",
-    "v2-incompatible.js"
+    "src"
   ],
   "scripts": {
     "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
-    "clean": "rimraf dist",
+    "clean": "rimraf dist lib",
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",
     "lint": "eslint .",
@@ -51,7 +51,9 @@
   },
   "sanityPlugin": {
     "verifyPackage": {
-      "apiExtractor": false
+      "apiExtractor": false,
+      "sanityV2Json": false,
+      "eslintImports": false
     }
   },
   "dependencies": {
@@ -88,8 +90,8 @@
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "react": "^18",
-    "sanity": "^3"
+    "react": "^16.8 || ^17 || ^18",
+    "sanity": "^2.0.0 || ^3.0.0"
   },
   "engines": {
     "node": ">=14"

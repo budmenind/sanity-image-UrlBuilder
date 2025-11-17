@@ -1,10 +1,14 @@
 # Installation Guide
 
-## Method 1: Local Installation (For Testing)
+## Sanity Studio V2 - Standalone Tool
 
-### Step 1: Build the Plugin
+This plugin provides a **standalone tool** accessible from your Studio's navigation bar. It allows you to browse your media library and generate responsive image URLs without being tied to document fields.
 
-In the plugin directory (`sanity-image-UrlBuilder`):
+### Method 1: Local Installation (For Testing)
+
+#### Step 1: Build the Plugin
+
+In the plugin directory:
 
 ```bash
 cd /home/user/sanity-image-UrlBuilder
@@ -12,7 +16,7 @@ npm install
 npm run build
 ```
 
-### Step 2: Link the Plugin
+#### Step 2: Link the Plugin
 
 Still in the plugin directory:
 
@@ -22,119 +26,59 @@ npm link
 
 This creates a global symlink to this plugin.
 
-### Step 3: Navigate to Your Sanity Studio
+#### Step 3: Navigate to Your Sanity Studio
 
 ```bash
 cd /path/to/your/sanity-studio
 ```
 
-### Step 4: Link the Plugin to Your Studio
+#### Step 4: Link the Plugin to Your Studio
 
 ```bash
 npm link sanity-plugin-image-url-generator
 ```
 
-### Step 5: Add the Plugin to Your Sanity Config
+#### Step 5: Add the Plugin to Your Studio
 
-Edit `sanity.config.ts` (or `sanity.config.js`):
+For Sanity V2, add the plugin to your `sanity.json`:
 
-```typescript
-import {defineConfig} from 'sanity'
-import {deskTool} from 'sanity/desk'
-import {imageUrlGenerator} from 'sanity-plugin-image-url-generator'
-
-export default defineConfig({
-  name: 'default',
-  title: 'My Sanity Project',
-
-  projectId: 'your-project-id',
-  dataset: 'production',
-
-  plugins: [
-    deskTool(),
-    imageUrlGenerator({
-      // Optional: Configure defaults
-      defaultAspectRatio: '16:9',
-      defaultWidths: [640, 1024, 1600],
-      defaultQuality: 75,
-    })
-  ],
-
-  schema: {
-    types: [
-      // Your schema types will be here
-    ],
+```json
+{
+  "root": true,
+  "project": {
+    "name": "Your Project Name"
   },
-})
+  "plugins": [
+    "@sanity/base",
+    "@sanity/components",
+    "@sanity/default-layout",
+    "@sanity/default-login",
+    "@sanity/desk-tool",
+    "sanity-plugin-image-url-generator"
+  ]
+}
 ```
 
-### Step 6: Use the Plugin in Your Schema
-
-Create or edit a schema file (e.g., `schemas/blogPost.ts`):
-
-```typescript
-import {defineType, defineField} from 'sanity'
-
-export default defineType({
-  name: 'blogPost',
-  type: 'document',
-  title: 'Blog Post',
-  fields: [
-    defineField({
-      name: 'title',
-      type: 'string',
-      title: 'Title',
-    }),
-    defineField({
-      name: 'heroImage',
-      type: 'imageUrlGenerator', // ← Use the custom type
-      title: 'Hero Image',
-      description: 'Upload an image and generate responsive URLs',
-      options: {
-        // Optional: Override plugin defaults for this field
-        defaultAspectRatio: '16:9',
-        defaultWidths: [640, 1024, 1600, 2400],
-      }
-    }),
-    defineField({
-      name: 'content',
-      type: 'text',
-      title: 'Content',
-    }),
-  ],
-})
-```
-
-### Step 7: Register Your Schema
-
-Make sure your schema is registered in `sanity.config.ts`:
-
-```typescript
-import blogPost from './schemas/blogPost'
-
-export default defineConfig({
-  // ... other config
-  schema: {
-    types: [blogPost],
-  },
-})
-```
-
-### Step 8: Start Your Studio
+#### Step 6: Start Your Studio
 
 ```bash
 npm run dev
+# or
+sanity start
 ```
 
-### Step 9: Test the Plugin
+#### Step 7: Access the Tool
 
 1. Open your Studio in the browser (usually `http://localhost:3333`)
-2. Create a new Blog Post document
-3. You should see the Hero Image field with:
-   - Standard Sanity image upload/selection UI
-   - Hotspot and crop tools
-   - Below that: URL generation controls (aspect ratio, widths, quality, etc.)
-   - Generated URLs with copy buttons
+2. Look for **"Image URL Generator"** in the top navigation bar
+3. Click it to open the tool
+4. You should see:
+   - Search box to filter images
+   - Grid of images from your media library
+   - Click any image to select it
+   - Configuration panel appears with aspect ratio, size, quality, format options
+   - Generated URLs section with copy buttons
+   - Live preview of the image
 
 ---
 
@@ -149,13 +93,26 @@ cd /path/to/your/sanity-studio
 npm install sanity-plugin-image-url-generator
 ```
 
-### Step 2: Add to Config
+### Step 2: Add to sanity.json
 
-Same as Method 1, Step 5 above.
+Add `"sanity-plugin-image-url-generator"` to your `plugins` array in `sanity.json`:
 
-### Step 3: Use in Schema
+```json
+{
+  "plugins": [
+    "@sanity/base",
+    "@sanity/default-layout",
+    "@sanity/desk-tool",
+    "sanity-plugin-image-url-generator"
+  ]
+}
+```
 
-Same as Method 1, Step 6 above.
+### Step 3: Restart Studio
+
+```bash
+npm run dev
+```
 
 ---
 
@@ -180,114 +137,33 @@ If you see `Cannot find module 'sanity-plugin-image-url-generator'`:
    npm link sanity-plugin-image-url-generator
    ```
 
-### Type Errors
+### Plugin Not Showing in Navigation
+
+1. Check that `"sanity-plugin-image-url-generator"` is in your `plugins` array in `sanity.json`
+2. Make sure you restarted the Studio after adding the plugin
+3. Clear your browser cache and reload
+4. Check the browser console for errors
+
+### "Tool not found" Error
+
+1. Make sure the plugin is properly installed and linked
+2. Verify `sanity.json` in the plugin directory has the correct tool parts configured
+3. Try deleting `node_modules` in your Studio and running `npm install` again
+
+### No Images Showing in Media Browser
+
+1. Make sure you have images uploaded to your Sanity project
+2. Check that your project ID and dataset are correctly configured
+3. Verify you have read permissions for the dataset
+4. Check the browser console for GROQ query errors
+
+### TypeScript Errors
 
 If you see TypeScript errors:
 
 1. Make sure the plugin is built: `npm run build` in the plugin directory
 2. Restart your TypeScript server in your IDE
 3. Restart the Studio dev server
-
-### Plugin Not Showing Up
-
-1. Check that `imageUrlGenerator()` is in your `plugins` array in `sanity.config.ts`
-2. Make sure you're using type `'imageUrlGenerator'` in your schema
-3. Clear your browser cache and reload
-4. Check the browser console for errors
-
-### URLs Not Generating
-
-1. Make sure an image is selected/uploaded
-2. Check browser console for errors
-3. Verify your Sanity project ID and dataset are correct
-
----
-
-## Example: Complete Setup
-
-Here's a complete working example:
-
-### sanity.config.ts
-```typescript
-import {defineConfig} from 'sanity'
-import {deskTool} from 'sanity/desk'
-import {imageUrlGenerator} from 'sanity-plugin-image-url-generator'
-import {schemaTypes} from './schemas'
-
-export default defineConfig({
-  name: 'default',
-  title: 'My Blog',
-  projectId: 'abc123',
-  dataset: 'production',
-
-  plugins: [
-    deskTool(),
-    imageUrlGenerator({
-      defaultAspectRatio: '16:9',
-      defaultWidths: [640, 1024, 1600],
-      defaultQuality: 80,
-    })
-  ],
-
-  schema: {
-    types: schemaTypes,
-  },
-})
-```
-
-### schemas/index.ts
-```typescript
-import blogPost from './blogPost'
-import page from './page'
-
-export const schemaTypes = [blogPost, page]
-```
-
-### schemas/blogPost.ts
-```typescript
-import {defineType, defineField} from 'sanity'
-
-export default defineType({
-  name: 'blogPost',
-  type: 'document',
-  title: 'Blog Post',
-  fields: [
-    defineField({
-      name: 'title',
-      type: 'string',
-      title: 'Title',
-    }),
-    defineField({
-      name: 'slug',
-      type: 'slug',
-      title: 'Slug',
-      options: {
-        source: 'title',
-      },
-    }),
-    defineField({
-      name: 'heroImage',
-      type: 'imageUrlGenerator',
-      title: 'Hero Image',
-    }),
-    defineField({
-      name: 'thumbnail',
-      type: 'imageUrlGenerator',
-      title: 'Thumbnail',
-      options: {
-        defaultAspectRatio: '1:1',
-        defaultWidths: [150, 300, 600],
-      }
-    }),
-    defineField({
-      name: 'body',
-      type: 'array',
-      title: 'Body',
-      of: [{type: 'block'}],
-    }),
-  ],
-})
-```
 
 ---
 
@@ -296,30 +172,124 @@ export default defineType({
 To verify the plugin is working:
 
 1. **Check Plugin Loaded**: Open browser console, you should see no errors
-2. **Check Schema**: The field should appear in your document
-3. **Test Upload**: Try uploading an image - the standard Sanity upload should work
-4. **Test Hotspot**: Click "Edit hotspot" - Sanity's hotspot editor should appear
-5. **Test Crop**: Click "Edit crop" - Sanity's crop tool should appear
-6. **Check URL Generation**: After selecting an image, you should see:
-   - Aspect ratio selector
-   - Width checkboxes
-   - Quality slider
-   - Format dropdown
-   - Generated URLs section with copy buttons
+2. **Check Navigation**: Look for "Image URL Generator" in the top navigation
+3. **Click the Tool**: The tool should open showing the media browser
+4. **Test Search**: Try searching for an image by filename
+5. **Test Selection**: Click an image - configuration panel should appear
+6. **Test URL Generation**:
+   - Select different aspect ratios
+   - Choose different widths
+   - Adjust quality slider
+   - URLs should update in real-time
+7. **Test Copy Buttons**: Click copy buttons to verify URLs are copied to clipboard
+8. **Test Preview**: Preview image should display at the bottom
 
 ---
 
-## Next Steps
+## What You'll See
 
-Once installed and working:
+When you open the tool from the navigation bar:
 
-1. Test all features thoroughly
-2. Try different aspect ratios
-3. Test with various image formats (JPG, PNG, WebP)
-4. Test hotspot and crop changes
-5. Verify URLs are correct
-6. Test copy buttons
-7. Check preview image displays
+```
+┌─────────────────────────────────────────────────┐
+│  Image URL Generator                            │
+│  Select an image from your media library        │
+│  and generate responsive URLs                   │
+└─────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────┐
+│  Media Library              [Clear Selection]   │
+│                                                  │
+│  [Search images by filename...]                 │
+│                                                  │
+│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐              │
+│  │ IMG │ │ IMG │ │ IMG │ │ IMG │              │
+│  │ 1   │ │ 2   │ │ 3   │ │ 4   │              │
+│  └─────┘ └─────┘ └─────┘ └─────┘              │
+│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐              │
+│  │ IMG │ │ IMG │ │ IMG │ │ IMG │              │
+│  │ 5   │ │ 6   │ │ 7   │ │ 8   │              │
+│  └─────┘ └─────┘ └─────┘ └─────┘              │
+└─────────────────────────────────────────────────┘
+
+After selecting an image:
+
+┌─────────────────────────────────────────────────┐
+│  Image URL Configuration                        │
+│                                                  │
+│  Aspect Ratio: [16:9 ▼]    Format: [auto ▼]   │
+│                             Quality: 75% ━━◉━   │
+│                                                  │
+│  Widths:                    Fit Mode: [clip ▼] │
+│  ☑640 ☑1024 ☑1600                              │
+└─────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────┐
+│  Generated URLs                                 │
+│                                                  │
+│  Single URL:                                    │
+│  https://cdn.sanity.io/...                      │
+│  [Copy URL] [Preview]                           │
+│                                                  │
+│  Responsive Markup:                             │
+│  [HTML] [Markdown] [JSON]                       │
+│  <img src="..." srcset="..." />                 │
+│  [Copy HTML]                                    │
+│                                                  │
+│  Live Preview:                                  │
+│  [Image preview shown here]                     │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## Using the Utility Functions in Your Frontend
+
+The plugin also exports utility functions that you can use in your frontend application:
+
+```typescript
+import {
+  buildImageUrl,
+  buildImageUrls,
+  buildResponsiveHtml,
+  buildMarkdown,
+  buildJson,
+  COMMON_ASPECT_RATIOS,
+  COMMON_WIDTHS,
+} from 'sanity-plugin-image-url-generator'
+
+// Build a single URL
+const url = buildImageUrl({
+  projectId: 'your-project',
+  dataset: 'production',
+  asset: imageAsset, // SanityImageAssetDocument
+  width: 1200,
+  aspectRatio: '16:9',
+  fit: 'clip',
+  quality: 80,
+})
+
+// Build multiple URLs for srcset
+const urls = buildImageUrls({
+  projectId: 'your-project',
+  dataset: 'production',
+  asset: imageAsset,
+  widths: [640, 1024, 1600],
+  aspectRatio: '16:9',
+  fit: 'clip',
+  quality: 80,
+})
+
+// Generate HTML markup
+const html = buildResponsiveHtml({
+  projectId: 'your-project',
+  dataset: 'production',
+  asset: imageAsset,
+  widths: [640, 1024, 1600],
+  aspectRatio: '16:9',
+  alt: 'Description',
+})
+```
 
 ---
 
@@ -331,7 +301,28 @@ To remove the plugin:
 # In your Studio
 npm unlink sanity-plugin-image-url-generator
 
-# Remove from sanity.config.ts
-# Remove 'imageUrlGenerator' type from schemas
-# Change fields to regular 'image' type
+# Remove from sanity.json plugins array
+# Restart Studio
 ```
+
+---
+
+## Next Steps
+
+Once installed and working:
+
+1. Browse your media library
+2. Test image selection
+3. Try different aspect ratios
+4. Test with various widths
+5. Adjust quality settings
+6. Try different formats (WebP, JPEG, PNG)
+7. Test copy buttons
+8. Verify URLs work in your frontend
+9. Check preview images display correctly
+
+---
+
+## Sanity Studio V3 Support
+
+While this plugin is primarily designed for V2 as a standalone tool, it also works with V3. The utility functions are fully compatible with V3, and you can use them in your V3 projects for URL generation.

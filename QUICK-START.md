@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-## 5-Minute Setup
+## 5-Minute Setup (Sanity V2)
 
 ### 1. Build & Link (in plugin directory)
 ```bash
@@ -16,39 +16,34 @@ cd /path/to/your/sanity-studio
 npm link sanity-plugin-image-url-generator
 ```
 
-### 3. Add to Config
-```typescript
-// sanity.config.ts
-import {imageUrlGenerator} from 'sanity-plugin-image-url-generator'
-
-export default defineConfig({
-  // ... other config
-  plugins: [
-    imageUrlGenerator()
-  ]
-})
-```
-
-### 4. Use in Schema
-```typescript
-// schemas/blogPost.ts
+### 3. Add to sanity.json
+```json
 {
-  name: 'heroImage',
-  type: 'imageUrlGenerator',
-  title: 'Hero Image'
+  "root": true,
+  "plugins": [
+    "@sanity/base",
+    "@sanity/default-layout",
+    "@sanity/desk-tool",
+    "sanity-plugin-image-url-generator"
+  ]
 }
 ```
 
-### 5. Start Studio
+### 4. Start Studio
 ```bash
 npm run dev
 ```
 
-### 6. Test It!
+### 5. Access the Tool
 1. Open `http://localhost:3333`
-2. Create a document with your image field
-3. Upload an image
-4. See URL generation controls appear below
+2. Look for **"Image URL Generator"** in the top navigation
+3. Click to open the tool
+
+### 6. Test It!
+1. Search for images in the media browser
+2. Click an image to select it
+3. See configuration panel appear
+4. Adjust aspect ratio, widths, quality, format
 5. Copy your generated URLs!
 
 ---
@@ -57,11 +52,25 @@ npm run dev
 
 ```
 ┌─────────────────────────────────────┐
-│  📁 Upload or Select Image          │
-│  [Drag & drop or browse]            │
-│  ✓ Image selected                   │
-│  [Edit Hotspot] [Edit Crop]         │
+│  Image URL Generator                │
+│  Select an image from your media    │
+│  library and generate URLs          │
 └─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│  Media Library    [Clear Selection] │
+│                                      │
+│  [🔍 Search images...]              │
+│                                      │
+│  ┌───┐ ┌───┐ ┌───┐ ┌───┐          │
+│  │IMG│ │IMG│ │IMG│ │IMG│          │
+│  └───┘ └───┘ └───┘ └───┘          │
+│  ┌───┐ ┌───┐ ┌───┐ ┌───┐          │
+│  │IMG│ │IMG│ │IMG│ │IMG│          │
+│  └───┘ └───┘ └───┘ └───┘          │
+└─────────────────────────────────────┘
+
+Click an image to see:
 
 ┌─────────────────────────────────────┐
 │  ⚙️ Image URL Configuration         │
@@ -96,14 +105,59 @@ npm run dev
 **"Cannot find module"**
 → Run `npm link` in plugin dir, then `npm link sanity-plugin-image-url-generator` in Studio
 
-**Plugin not showing**
-→ Check `plugins` array in `sanity.config.ts` includes `imageUrlGenerator()`
+**Plugin not showing in navigation**
+→ Check `plugins` array in `sanity.json` includes `"sanity-plugin-image-url-generator"`
 
-**Field not appearing**
-→ Make sure field type is `'imageUrlGenerator'` (not `'image'`)
+**No images appearing**
+→ Make sure you have images uploaded to your Sanity project
 
-**No URL controls**
-→ Upload/select an image first - controls appear after image is selected
+**Tool not opening**
+→ Clear browser cache, restart Studio dev server, check console for errors
+
+---
+
+## Key Features
+
+✨ **Standalone Tool** - Access from Studio navigation, not tied to documents
+🔍 **Media Browser** - Browse and search your existing media library
+📐 **Aspect Ratios** - 16:9, 4:3, 1:1, 21:9, and custom ratios
+📏 **Responsive Widths** - Multiple sizes for srcset (640, 1024, 1600, etc.)
+🎨 **Formats** - Auto, WebP, JPEG, PNG
+⚙️ **Quality Control** - Adjust compression (1-100%)
+🔧 **Fit Modes** - Clip, Crop, Fill, Scale, and more
+📋 **Copy Buttons** - One-click copy for URLs and markup
+🖼️ **Live Preview** - See your image with current settings
+📱 **HTML/Markdown/JSON** - Export in multiple formats
+
+---
+
+## Using Utility Functions
+
+You can also use the plugin's utility functions directly in your code:
+
+```typescript
+import {buildImageUrl, buildResponsiveHtml} from 'sanity-plugin-image-url-generator'
+
+// Generate a single URL
+const url = buildImageUrl({
+  projectId: 'abc123',
+  dataset: 'production',
+  asset: imageAsset,
+  width: 1200,
+  aspectRatio: '16:9',
+  quality: 80,
+})
+
+// Generate responsive HTML
+const html = buildResponsiveHtml({
+  projectId: 'abc123',
+  dataset: 'production',
+  asset: imageAsset,
+  widths: [640, 1024, 1600],
+  aspectRatio: '16:9',
+  alt: 'Hero image',
+})
+```
 
 ---
 
@@ -112,4 +166,24 @@ npm run dev
 - [INSTALLATION.md](./INSTALLATION.md) - Detailed setup guide
 - [HOW-IT-WORKS.md](./HOW-IT-WORKS.md) - Technical architecture
 - [README.md](./README.md) - Complete feature list
-- [examples/usage.ts](./examples/usage.ts) - Code examples
+- [TEST-RESULTS.md](./TEST-RESULTS.md) - Build verification
+
+---
+
+## Differences from Original Design
+
+This plugin is now a **standalone tool** instead of a document field type:
+
+**What changed:**
+- ✅ Accessible from Studio navigation bar (not a field)
+- ✅ Browse entire media library (not limited to a document)
+- ✅ Works with Sanity V2 (using parts system)
+- ✅ No schema changes needed
+- ✅ All utility functions still work the same
+
+**Why it's better:**
+- Quick access from anywhere in Studio
+- Not tied to specific documents or content types
+- Can generate URLs for any image on-demand
+- Simpler installation (just add to plugins array)
+- More flexible workflow

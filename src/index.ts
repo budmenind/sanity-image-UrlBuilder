@@ -1,58 +1,31 @@
-import {definePlugin} from 'sanity'
-import {ImageUrlGenerator} from './components/ImageUrlGenerator'
+/**
+ * Image URL Generator Plugin for Sanity Studio
+ *
+ * Works with both Sanity Studio V2 and V3:
+ *
+ * **Sanity V2**: Provides a standalone tool accessible from the Studio topbar
+ * that allows you to browse your media library and generate responsive URLs.
+ * The tool is automatically registered via sanity.json.
+ *
+ * **Sanity V3**: Can also be used as a custom input component (optional).
+ *
+ * @public
+ */
+
+// V3 plugin support (optional - for document field usage)
 import type {PluginOptions} from './types'
 
 /**
- * Image URL Generator Plugin for Sanity Studio v3
- *
- * Provides a custom input component for generating responsive image URLs
- * with configurable aspect ratios, sizes, and formats.
- *
+ * Optional V3 plugin for using as a document field type
+ * Note: Most users will want the V2 tool instead
  * @public
- * @example
- * ```ts
- * import {imageUrlGenerator} from 'sanity-plugin-image-url-generator'
- *
- * export default defineConfig({
- *   // ...
- *   plugins: [
- *     imageUrlGenerator({
- *       defaultAspectRatio: '16:9',
- *       defaultWidths: [640, 1024, 1600]
- *     })
- *   ]
- * })
- * ```
  */
-export const imageUrlGenerator = definePlugin<PluginOptions | void>((options = {}) => {
+export const imageUrlGenerator = (options: PluginOptions = {}) => {
   return {
     name: 'sanity-plugin-image-url-generator',
-    schema: {
-      types: [
-        {
-          name: 'imageUrlGenerator',
-          type: 'image',
-          title: 'Image with URL Generator',
-          options: {
-            hotspot: true,
-            ...options,
-          },
-          fields: [
-            {
-              name: 'alt',
-              type: 'string',
-              title: 'Alt Text',
-              description: 'Important for SEO and accessibility',
-            },
-          ],
-          components: {
-            input: ImageUrlGenerator as any,
-          },
-        },
-      ],
-    },
+    title: 'Image URL Generator',
   }
-})
+}
 
 /** @public */
 export {ImageUrlGenerator, type ImageUrlGeneratorProps} from './components/ImageUrlGenerator'
