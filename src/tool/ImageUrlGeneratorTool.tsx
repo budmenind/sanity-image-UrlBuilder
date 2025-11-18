@@ -1,10 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
-import {Box, Button, Card, Container, Flex, Grid, Heading, Label, Select, Stack, Text, TextInput} from '@sanity/ui'
 import sanityClient from 'part:@sanity/base/client'
 import type {SanityImageAssetDocument} from '@sanity/client'
-import {AspectRatioSelector} from '../components/AspectRatioSelector'
-import {SizeSelector} from '../components/SizeSelector'
-import {UrlDisplay} from '../components/UrlDisplay'
 import {buildAllMarkup} from '../utils/markupBuilder'
 import {buildImageUrl, getPreviewUrl} from '../utils/urlBuilder'
 import type {
@@ -14,6 +10,36 @@ import type {
   ImageFormat,
   ImageUrlGeneratorState,
 } from '../types'
+
+// Simple copy button for V2
+function CopyButton({text, label}: {text: string; label?: string}) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      style={{
+        background: copied ? '#00a651' : '#2276fc',
+        color: '#fff',
+        border: 'none',
+        padding: '0.5rem 1rem',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        marginTop: '0.5rem',
+      }}
+    >
+      {copied ? '✓ Copied!' : label || 'Copy'}
+    </button>
+  )
+}
 
 /**
  * Sanity V2 Tool Component for Image URL Generation
@@ -125,231 +151,413 @@ export default function ImageUrlGeneratorTool() {
     []
   )
 
+  const styles = {
+    container: {
+      padding: '2rem',
+      maxWidth: '1200px',
+      margin: '0 auto',
+    },
+    header: {
+      marginBottom: '2rem',
+    },
+    title: {
+      fontSize: '2rem',
+      fontWeight: 600,
+      marginBottom: '0.5rem',
+    },
+    subtitle: {
+      color: '#666',
+      fontSize: '0.95rem',
+    },
+    card: {
+      background: '#fff',
+      border: '1px solid #e0e0e0',
+      borderRadius: '4px',
+      padding: '1.5rem',
+      marginBottom: '1.5rem',
+    },
+    cardHeader: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '1rem',
+    },
+    cardTitle: {
+      fontSize: '1.1rem',
+      fontWeight: 600,
+    },
+    button: {
+      background: '#2276fc',
+      color: '#fff',
+      border: 'none',
+      padding: '0.5rem 1rem',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+    },
+    buttonGhost: {
+      background: 'transparent',
+      color: '#2276fc',
+      border: '1px solid #2276fc',
+      padding: '0.5rem 1rem',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+    },
+    input: {
+      width: '100%',
+      padding: '0.75rem',
+      border: '1px solid #d0d0d0',
+      borderRadius: '4px',
+      fontSize: '1rem',
+      marginBottom: '1rem',
+    },
+    grid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+      gap: '1rem',
+      maxHeight: '400px',
+      overflowY: 'auto' as const,
+    },
+    gridItem: {
+      border: '2px solid #e0e0e0',
+      borderRadius: '4px',
+      padding: '0.5rem',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+    },
+    gridItemSelected: {
+      border: '2px solid #2276fc',
+      boxShadow: '0 2px 8px rgba(34, 118, 252, 0.2)',
+    },
+    gridImage: {
+      width: '100%',
+      height: 'auto',
+      display: 'block',
+      borderRadius: '4px',
+      marginBottom: '0.5rem',
+    },
+    gridText: {
+      fontSize: '0.8rem',
+      wordBreak: 'break-word' as const,
+      marginBottom: '0.25rem',
+    },
+    gridMuted: {
+      fontSize: '0.75rem',
+      color: '#999',
+    },
+    formGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+      gap: '1.5rem',
+    },
+    label: {
+      display: 'block',
+      fontSize: '0.9rem',
+      fontWeight: 500,
+      marginBottom: '0.5rem',
+    },
+    select: {
+      width: '100%',
+      padding: '0.75rem',
+      border: '1px solid #d0d0d0',
+      borderRadius: '4px',
+      fontSize: '1rem',
+      background: '#fff',
+    },
+    emptyState: {
+      textAlign: 'center' as const,
+      padding: '3rem',
+      color: '#999',
+    },
+  }
+
   return (
-    <Container width={4} padding={4}>
-      <Stack space={5}>
-        {/* Header */}
-        <Box paddingY={3}>
-          <Heading size={3}>Image URL Generator</Heading>
-          <Text size={1} muted style={{marginTop: '0.5rem'}}>
-            Select an image from your media library and generate responsive URLs
-          </Text>
-        </Box>
+    <div style={styles.container}>
+      {/* Header */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>Image URL Generator</h1>
+        <p style={styles.subtitle}>
+          Select an image from your media library and generate responsive URLs
+        </p>
+      </div>
 
-        {/* Media Browser */}
-        <Card border padding={4} radius={2}>
-          <Stack space={4}>
-            <Flex align="center" justify="space-between">
-              <Text size={2} weight="bold">
-                Media Library
-              </Text>
-              {selectedAsset && (
-                <Button
-                  mode="ghost"
-                  text="Clear Selection"
-                  onClick={() => setSelectedAsset(null)}
-                  fontSize={1}
+      {/* Media Browser */}
+      <div style={styles.card}>
+        <div style={styles.cardHeader}>
+          <h2 style={styles.cardTitle}>Media Library</h2>
+          {selectedAsset && (
+            <button
+              style={styles.buttonGhost}
+              onClick={() => setSelectedAsset(null)}
+            >
+              Clear Selection
+            </button>
+          )}
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search images by filename..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={styles.input}
+        />
+
+        {isLoadingAssets ? (
+          <div style={{padding: '2rem', textAlign: 'center', color: '#999'}}>
+            Loading images...
+          </div>
+        ) : assets.length === 0 ? (
+          <div style={{padding: '2rem', textAlign: 'center', color: '#999'}}>
+            No images found
+          </div>
+        ) : (
+          <div style={styles.grid}>
+            {assets.map((asset) => (
+              <div
+                key={asset._id}
+                style={{
+                  ...styles.gridItem,
+                  ...(selectedAsset?._id === asset._id ? styles.gridItemSelected : {}),
+                }}
+                onClick={() => setSelectedAsset(asset)}
+              >
+                <img
+                  src={`${asset.url}?w=300&h=200&fit=crop`}
+                  alt={asset.originalFilename || ''}
+                  style={styles.gridImage}
                 />
-              )}
-            </Flex>
+                <div style={styles.gridText}>
+                  {asset.originalFilename || 'Untitled'}
+                </div>
+                <div style={styles.gridMuted}>
+                  {asset.metadata?.dimensions?.width} × {asset.metadata?.dimensions?.height}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-            {/* Search */}
-            <TextInput
-              placeholder="Search images by filename..."
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.currentTarget.value)}
-              fontSize={2}
-            />
+      {/* Configuration Panel */}
+      {selectedAsset && (
+        <>
+          <div style={styles.card}>
+            <h2 style={{...styles.cardTitle, marginBottom: '1.5rem'}}>
+              Image URL Configuration
+            </h2>
 
-            {/* Asset Grid */}
-            {isLoadingAssets ? (
-              <Box padding={4}>
-                <Text size={1} align="center" muted>
-                  Loading images...
-                </Text>
-              </Box>
-            ) : assets.length === 0 ? (
-              <Box padding={4}>
-                <Text size={1} align="center" muted>
-                  No images found
-                </Text>
-              </Box>
-            ) : (
-              <Box style={{maxHeight: '400px', overflowY: 'auto'}}>
-                <Grid columns={[2, 3, 4]} gap={3}>
-                  {assets.map((asset) => (
-                    <Card
-                      key={asset._id}
-                      padding={2}
-                      radius={2}
-                      shadow={selectedAsset?._id === asset._id ? 2 : 1}
-                      tone={selectedAsset?._id === asset._id ? 'primary' : 'default'}
-                      style={{cursor: 'pointer'}}
-                      onClick={() => setSelectedAsset(asset)}
-                    >
-                      <Box>
-                        <img
-                          src={`${asset.url}?w=300&h=200&fit=crop`}
-                          alt={asset.originalFilename || ''}
-                          style={{
-                            width: '100%',
-                            height: 'auto',
-                            display: 'block',
-                            borderRadius: '4px',
-                          }}
-                        />
-                        <Box paddingTop={2}>
-                          <Text size={0} style={{wordBreak: 'break-word'}}>
-                            {asset.originalFilename || 'Untitled'}
-                          </Text>
-                          <Text size={0} muted>
-                            {asset.metadata?.dimensions?.width} × {asset.metadata?.dimensions?.height}
-                          </Text>
-                        </Box>
-                      </Box>
-                    </Card>
-                  ))}
-                </Grid>
-              </Box>
-            )}
-          </Stack>
-        </Card>
+            <div style={styles.formGrid}>
+              {/* Aspect Ratio */}
+              <div>
+                <label style={styles.label}>Aspect Ratio</label>
+                <select
+                  value={state.aspectRatio}
+                  onChange={(e) => updateState({aspectRatio: e.target.value})}
+                  style={styles.select}
+                >
+                  <option value="16:9">16:9 (Widescreen)</option>
+                  <option value="4:3">4:3 (Standard)</option>
+                  <option value="1:1">1:1 (Square)</option>
+                  <option value="21:9">21:9 (Ultra-wide)</option>
+                  <option value="9:16">9:16 (Portrait)</option>
+                  <option value="3:2">3:2 (Photo)</option>
+                  <option value="2:3">2:3 (Portrait Photo)</option>
+                </select>
+              </div>
 
-        {/* Configuration Panel - Only show if image is selected */}
-        {selectedAsset && (
-          <>
-            <Card border padding={4} radius={2}>
-              <Stack space={4}>
-                <Text size={2} weight="bold">
-                  Image URL Configuration
-                </Text>
+              {/* Format */}
+              <div>
+                <label style={styles.label}>Format</label>
+                <select
+                  value={state.format}
+                  onChange={(e) => updateState({format: e.target.value as ImageFormat})}
+                  style={styles.select}
+                >
+                  <option value="auto">Auto (recommended)</option>
+                  <option value="webp">WebP</option>
+                  <option value="jpg">JPEG</option>
+                  <option value="png">PNG</option>
+                </select>
+              </div>
+            </div>
 
-                <Grid columns={[1, 1, 2]} gap={4}>
-                  {/* Aspect Ratio */}
-                  <AspectRatioSelector
-                    value={state.aspectRatio}
-                    onChange={(ratio) => updateState({aspectRatio: ratio})}
-                    customWidth={state.customAspectWidth}
-                    customHeight={state.customAspectHeight}
-                    onCustomWidthChange={(width) => updateState({customAspectWidth: width})}
-                    onCustomHeightChange={(height) => updateState({customAspectHeight: height})}
-                    showCustom={state.showCustomAspectRatio}
-                    onShowCustomChange={(show) => updateState({showCustomAspectRatio: show})}
-                  />
+            <div style={{...styles.formGrid, marginTop: '1.5rem'}}>
+              {/* Quality */}
+              <div>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                  <label style={styles.label}>Quality</label>
+                  <span style={{fontSize: '0.9rem', color: '#666'}}>{state.quality}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={state.quality}
+                  onChange={(e) => updateState({quality: parseInt(e.target.value, 10)})}
+                  style={{width: '100%'}}
+                />
+              </div>
 
-                  {/* Format and Quality */}
-                  <Stack space={3}>
-                    <Stack space={3}>
-                      <Label size={1}>Format</Label>
-                      <Select
-                        value={state.format}
-                        onChange={(event) =>
-                          updateState({format: (event.currentTarget as HTMLSelectElement).value as ImageFormat})
+              {/* Fit Mode */}
+              <div>
+                <label style={styles.label}>Fit Mode</label>
+                <select
+                  value={state.fitMode}
+                  onChange={(e) => updateState({fitMode: e.target.value as FitMode})}
+                  style={styles.select}
+                >
+                  <option value="clip">Clip (default)</option>
+                  <option value="crop">Crop</option>
+                  <option value="fill">Fill</option>
+                  <option value="fillmax">Fill Max</option>
+                  <option value="max">Max</option>
+                  <option value="scale">Scale</option>
+                  <option value="min">Min</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Widths */}
+            <div style={{marginTop: '1.5rem'}}>
+              <label style={styles.label}>Responsive Widths</label>
+              <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
+                {[320, 640, 768, 1024, 1366, 1600, 1920, 2400].map((width) => (
+                  <label key={width} style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                    <input
+                      type="checkbox"
+                      checked={state.selectedWidths.includes(width)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          updateState({selectedWidths: [...state.selectedWidths, width].sort((a, b) => a - b)})
+                        } else {
+                          updateState({selectedWidths: state.selectedWidths.filter((w) => w !== width)})
                         }
-                        fontSize={2}
-                      >
-                        <option value="auto">Auto (recommended)</option>
-                        <option value="webp">WebP</option>
-                        <option value="jpg">JPEG</option>
-                        <option value="png">PNG</option>
-                      </Select>
-                    </Stack>
+                      }}
+                    />
+                    <span>{width}px</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
 
-                    <Stack space={3}>
-                      <Flex align="center" justify="space-between">
-                        <Label size={1}>Quality</Label>
-                        <Text size={1} muted>
-                          {state.quality}%
-                        </Text>
-                      </Flex>
-                      <Box>
-                        <input
-                          type="range"
-                          min={1}
-                          max={100}
-                          step={1}
-                          value={state.quality}
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                            updateState({quality: parseInt(event.target.value, 10)})
-                          }
-                          style={{width: '100%'}}
-                        />
-                      </Box>
-                    </Stack>
-                  </Stack>
-                </Grid>
+          {/* Generated URLs */}
+          {generatedContent && state.selectedWidths.length > 0 && (
+            <div style={styles.card}>
+              <h2 style={{...styles.cardTitle, marginBottom: '1.5rem'}}>Generated URLs</h2>
 
-                <Grid columns={[1, 1, 2]} gap={4}>
-                  {/* Size Selection */}
-                  <SizeSelector
-                    selectedWidths={state.selectedWidths}
-                    onChange={(widths) => updateState({selectedWidths: widths})}
-                    customWidth={state.customWidth}
-                    onCustomWidthChange={(width) => updateState({customWidth: width})}
-                  />
+              {/* Single URL */}
+              <div style={{marginBottom: '1.5rem'}}>
+                <label style={styles.label}>Single URL</label>
+                <div style={{
+                  background: '#f5f5f5',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
+                  wordBreak: 'break-all',
+                  marginBottom: '0.5rem',
+                }}>
+                  {generatedContent.singleUrl}
+                </div>
+                <CopyButton text={generatedContent.singleUrl} label="Copy URL" />
+              </div>
 
-                  {/* Fit Mode */}
-                  <Stack space={3}>
-                    <Label size={1}>Fit Mode</Label>
-                    <Select
-                      value={state.fitMode}
-                      onChange={(event) => updateState({fitMode: (event.currentTarget as HTMLSelectElement).value as FitMode})}
-                      fontSize={2}
-                    >
-                      <option value="clip">Clip (default)</option>
-                      <option value="crop">Crop</option>
-                      <option value="fill">Fill</option>
-                      <option value="fillmax">Fill Max</option>
-                      <option value="max">Max</option>
-                      <option value="scale">Scale</option>
-                      <option value="min">Min</option>
-                    </Select>
-                    <Text size={1} muted>
-                      <strong>Clip:</strong> Preserves aspect ratio, crops if needed
-                      <br />
-                      <strong>Crop:</strong> Fills the entire size, crops to fit
-                      <br />
-                      <strong>Fill:</strong> Ignores aspect ratio, stretches to fit
-                    </Text>
-                  </Stack>
-                </Grid>
-              </Stack>
-            </Card>
+              {/* HTML */}
+              <div style={{marginBottom: '1.5rem'}}>
+                <label style={styles.label}>Responsive HTML</label>
+                <div style={{
+                  background: '#f5f5f5',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.85rem',
+                  overflowX: 'auto',
+                  marginBottom: '0.5rem',
+                }}>
+                  <pre style={{margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
+                    {generatedContent.html}
+                  </pre>
+                </div>
+                <CopyButton text={generatedContent.html} label="Copy HTML" />
+              </div>
 
-            {/* Generated URLs Display */}
-            {generatedContent && state.selectedWidths.length > 0 && (
-              <Card border padding={4} radius={2}>
-                <Stack space={4}>
-                  <Text size={2} weight="bold">
-                    Generated URLs
-                  </Text>
-                  <UrlDisplay
-                    singleUrl={generatedContent.singleUrl}
-                    html={generatedContent.html}
-                    markdown={generatedContent.markdown}
-                    json={generatedContent.json}
-                    previewUrl={generatedContent.previewUrl}
-                  />
-                </Stack>
-              </Card>
-            )}
-          </>
-        )}
+              {/* Markdown */}
+              <div style={{marginBottom: '1.5rem'}}>
+                <label style={styles.label}>Markdown</label>
+                <div style={{
+                  background: '#f5f5f5',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
+                  wordBreak: 'break-all',
+                  marginBottom: '0.5rem',
+                }}>
+                  {generatedContent.markdown}
+                </div>
+                <CopyButton text={generatedContent.markdown} label="Copy Markdown" />
+              </div>
 
-        {/* Empty State */}
-        {!selectedAsset && !isLoadingAssets && (
-          <Card padding={5} radius={2} tone="transparent">
-            <Stack space={3}>
-              <Text size={2} align="center" weight="semibold">
-                Select an image to get started
-              </Text>
-              <Text size={1} align="center" muted>
-                Choose an image from your media library above to generate responsive URLs
-              </Text>
-            </Stack>
-          </Card>
-        )}
-      </Stack>
-    </Container>
+              {/* JSON */}
+              <div style={{marginBottom: '1.5rem'}}>
+                <label style={styles.label}>JSON</label>
+                <div style={{
+                  background: '#f5f5f5',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.85rem',
+                  overflowX: 'auto',
+                  marginBottom: '0.5rem',
+                }}>
+                  <pre style={{margin: 0}}>
+                    {JSON.stringify(JSON.parse(generatedContent.json), null, 2)}
+                  </pre>
+                </div>
+                <CopyButton text={generatedContent.json} label="Copy JSON" />
+              </div>
+
+              {/* Preview */}
+              {generatedContent.previewUrl && (
+                <div>
+                  <label style={styles.label}>Live Preview</label>
+                  <div style={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '4px',
+                    padding: '1rem',
+                    background: '#fafafa',
+                  }}>
+                    <img
+                      src={generatedContent.previewUrl}
+                      alt="Preview"
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Empty State */}
+      {!selectedAsset && !isLoadingAssets && (
+        <div style={styles.emptyState}>
+          <h3 style={{fontSize: '1.2rem', marginBottom: '0.5rem'}}>Select an image to get started</h3>
+          <p style={{fontSize: '0.95rem'}}>
+            Choose an image from your media library above to generate responsive URLs
+          </p>
+        </div>
+      )}
+    </div>
   )
 }
