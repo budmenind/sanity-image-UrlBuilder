@@ -46,8 +46,8 @@ function CopyButton({text, label}: {text: string; label?: string}) {
  * Provides a standalone interface to browse media library and generate URLs
  */
 export default function ImageUrlGeneratorTool() {
-  // V2 uses direct client import, not a hook
-  const client = sanityClient.withConfig({apiVersion: '2023-01-01'})
+  // V2 uses direct client import - memoize to avoid recreating on each render
+  const client = useMemo(() => sanityClient.withConfig({apiVersion: '2023-01-01'}), [])
 
   // Get project configuration
   const config = client.config()
@@ -81,16 +81,18 @@ export default function ImageUrlGeneratorTool() {
       : `*[_type == "sanity.imageAsset"] | order(_createdAt desc) [0...50]`
 
     client
-      .fetch<SanityImageAssetDocument[]>(query, {search: `*${searchQuery}*`})
+      .fetch(query, {search: `*${searchQuery}*`})
       .then((fetchedAssets: SanityImageAssetDocument[]) => {
-        setAssets(fetchedAssets)
+        console.log('Fetched assets:', fetchedAssets?.length || 0)
+        setAssets(fetchedAssets || [])
         setIsLoadingAssets(false)
       })
       .catch((error: Error) => {
         console.error('Failed to fetch assets:', error)
+        setAssets([])
         setIsLoadingAssets(false)
       })
-  }, [client, searchQuery])
+  }, [searchQuery]) // client is stable via useMemo
 
   // Generate URLs and markup
   const generatedContent = useMemo(() => {
