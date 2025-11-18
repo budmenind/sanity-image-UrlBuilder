@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import sanityClient from 'part:@sanity/base/client'
-import type {SanityImageAssetDocument} from '@sanity/client'
+import {SanityImageAssetDocument} from '@sanity/client'
 import {buildAllMarkup} from '../utils/markupBuilder'
 import {buildImageUrl, getPreviewUrl} from '../utils/urlBuilder'
-import type {
+import {
   CropData,
   FitMode,
   HotspotData,
