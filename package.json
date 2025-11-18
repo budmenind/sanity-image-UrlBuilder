@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-image-url-generator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Sanity Studio plugin (V2/V3) that provides a standalone tool for generating responsive image URLs with copy-paste functionality",
   "keywords": [
     "sanity",
