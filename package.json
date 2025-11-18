@@ -41,7 +41,7 @@
   ],
   "scripts": {
     "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
-    "build:v2": "mkdir -p lib && cp -r src/tool lib/ && cp src/types.ts lib/ && cp -r src/utils lib/ && cp -r src/components lib/",
+    "build:v2": "tsc --project tsconfig.v2.json",
     "clean": "rimraf dist lib",
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",
