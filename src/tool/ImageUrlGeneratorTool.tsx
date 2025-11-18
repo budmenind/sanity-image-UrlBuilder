@@ -387,6 +387,7 @@ export default function ImageUrlGeneratorTool() {
               const x = (e.clientX - rect.left) / rect.width
               const y = (e.clientY - rect.top) / rect.height
               setHotspot({
+                _type: 'sanity.imageHotspot',
                 x: Math.max(0, Math.min(1, x)),
                 y: Math.max(0, Math.min(1, y)),
                 width: 0.3,
