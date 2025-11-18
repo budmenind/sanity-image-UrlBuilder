@@ -46,8 +46,7 @@
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",
     "lint": "eslint .",
-    "postinstall": "npm run build:v2",
-    "prepublishOnly": "run-s build",
+    "prepublishOnly": "run-s build build:v2",
     "watch": "pkg-utils watch --strict",
     "prepare": "husky install"
   },
