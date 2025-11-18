@@ -60,6 +60,10 @@ export default function ImageUrlGeneratorTool() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoadingAssets, setIsLoadingAssets] = useState(false)
 
+  // Hotspot and crop state
+  const [hotspot, setHotspot] = useState<HotspotData | null>(null)
+  const [crop, setCrop] = useState<CropData | null>(null)
+
   // URL generator state
   const [state, setState] = useState<ImageUrlGeneratorState>({
     aspectRatio: '16:9',
@@ -72,6 +76,13 @@ export default function ImageUrlGeneratorTool() {
     customAspectWidth: '',
     customAspectHeight: '',
   })
+
+  // Reset hotspot/crop when selecting a new asset
+  const handleSelectAsset = useCallback((asset: SanityImageAssetDocument | null) => {
+    setSelectedAsset(asset)
+    setHotspot(null)
+    setCrop(null)
+  }, [])
 
   // Fetch assets from media library
   useEffect(() => {
@@ -109,8 +120,8 @@ export default function ImageUrlGeneratorTool() {
         fit: state.fitMode,
         quality: state.quality,
         format: state.format,
-        crop: undefined as CropData | undefined,
-        hotspot: undefined as HotspotData | undefined,
+        crop: crop || undefined,
+        hotspot: hotspot || undefined,
       }
 
       const singleUrl = buildImageUrl({
@@ -144,6 +155,8 @@ export default function ImageUrlGeneratorTool() {
     state.fitMode,
     state.quality,
     state.format,
+    hotspot,
+    crop,
   ])
 
   const updateState = useCallback(
@@ -291,7 +304,7 @@ export default function ImageUrlGeneratorTool() {
           {selectedAsset && (
             <button
               style={styles.buttonGhost}
-              onClick={() => setSelectedAsset(null)}
+              onClick={() => handleSelectAsset(null)}
             >
               Clear Selection
             </button>
@@ -323,7 +336,7 @@ export default function ImageUrlGeneratorTool() {
                   ...styles.gridItem,
                   ...(selectedAsset?._id === asset._id ? styles.gridItemSelected : {}),
                 }}
-                onClick={() => setSelectedAsset(asset)}
+                onClick={() => handleSelectAsset(asset)}
               >
                 <img
                   src={`${asset.url}?w=300&h=200&fit=crop`}
@@ -341,6 +354,109 @@ export default function ImageUrlGeneratorTool() {
           </div>
         )}
       </div>
+
+      {/* Hotspot Picker */}
+      {selectedAsset && (
+        <div style={styles.card}>
+          <div style={styles.cardHeader}>
+            <h2 style={styles.cardTitle}>Hotspot & Crop</h2>
+            {(hotspot || crop) && (
+              <button
+                style={styles.buttonGhost}
+                onClick={() => {
+                  setHotspot(null)
+                  setCrop(null)
+                }}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+          <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '1rem'}}>
+            Click on the image to set the focal point (hotspot). This determines the center of focus when cropping.
+          </p>
+          <div
+            style={{
+              position: 'relative',
+              display: 'inline-block',
+              cursor: 'crosshair',
+              maxWidth: '100%',
+            }}
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              const x = (e.clientX - rect.left) / rect.width
+              const y = (e.clientY - rect.top) / rect.height
+              setHotspot({
+                x: Math.max(0, Math.min(1, x)),
+                y: Math.max(0, Math.min(1, y)),
+                width: 0.3,
+                height: 0.3,
+              })
+            }}
+          >
+            <img
+              src={`${selectedAsset.url}?w=800`}
+              alt={selectedAsset.originalFilename || ''}
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+                display: 'block',
+                borderRadius: '4px',
+              }}
+            />
+            {/* Hotspot indicator */}
+            {hotspot && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${hotspot.x * 100}%`,
+                  top: `${hotspot.y * 100}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  background: 'rgba(34, 118, 252, 0.8)',
+                  border: '3px solid #fff',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                  pointerEvents: 'none',
+                }}
+              />
+            )}
+            {/* Crosshair guides */}
+            {hotspot && (
+              <>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: `${hotspot.x * 100}%`,
+                    top: 0,
+                    bottom: 0,
+                    width: '1px',
+                    background: 'rgba(34, 118, 252, 0.4)',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: `${hotspot.y * 100}%`,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'rgba(34, 118, 252, 0.4)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </>
+            )}
+          </div>
+          {hotspot && (
+            <div style={{marginTop: '1rem', fontSize: '0.9rem', color: '#666'}}>
+              <strong>Hotspot:</strong> X: {(hotspot.x * 100).toFixed(1)}%, Y: {(hotspot.y * 100).toFixed(1)}%
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Configuration Panel */}
       {selectedAsset && (
